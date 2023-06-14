@@ -1,0 +1,43 @@
+{
+  "name": "three-perf",
+  "version": "1.0.0",
+  "description": "Easily monitor your vanilla ThreeJS app performances.",
+  "keywords": [
+    "three",
+    "benchmark",
+    "performance",
+    "monitor",
+    "analysis",
+    "profiling"
+  ],
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "node demo/server.mjs",
+    "build": "vite build && tsc",
+    "serve": "vite serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheoTheDev/three-perf.git"
+  },
+  "author": "Bohdan Horpynchuk (https://github.com/TheoTheDev)",
+  "license": "MIT",
+  "files": [
+    "dist/*",
+    "src/*"
+  ],
+  "bugs": {
+    "url": "https://github.com/TheoTheDev/three-perf/issues"
+  },
+  "homepage": "https://github.com/TheoTheDev/three-perf#readme",
+  "devDependencies": {
+    "@types/three": "^0.152.1",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "three": "^0.153.0",
+    "typescript": "^5.1.3",
+    "vite": "^4.3.9"
+  }
+}
