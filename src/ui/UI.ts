@@ -23,15 +23,16 @@ export class ThreePerfUI {
     private _linesValueLabel: Text;
     private _pointsValueLabel: Text;
 
-    private _gpuChartGeometry: BufferGeometry;
-    private _cpuChartGeometry: BufferGeometry;
-    private _fpsChartGeometry: BufferGeometry;
+    private _charts: Map<string, Line> = new Map();
 
     //
 
     private _renderer: WebGLRenderer;
     private _scene: Scene;
     private _camera: OrthographicCamera;
+
+    private _width: number = 370;
+    private _height: number = 110;
 
     //
 
@@ -442,7 +443,7 @@ export class ThreePerfUI {
 
         // gpu chart
 
-        this._gpuChartGeometry = new BufferGeometry();
+        const gpuChartGeometry = new BufferGeometry();
         let positions = new Float32Array( 60 * 3 );
 
         for ( let i = 0; i < 60; i ++ ) {
@@ -455,14 +456,15 @@ export class ThreePerfUI {
 
         let positionAttribute = new BufferAttribute( positions, 3 );
         positionAttribute.usage = DynamicDrawUsage;
-        this._gpuChartGeometry.setAttribute( 'position', positionAttribute );
+        gpuChartGeometry.setAttribute( 'position', positionAttribute );
 
-        const gpuChart = new Line( this._gpuChartGeometry, new LineBasicMaterial({ color: 'rgb(253, 151, 31)' }) );
+        const gpuChart = new Line( gpuChartGeometry, new LineBasicMaterial({ color: 'rgb(253, 151, 31)' }) );
         this._scene.add( gpuChart );
+        this._charts.set( 'gpu', gpuChart );
 
         // cpu chart
 
-        this._cpuChartGeometry = new BufferGeometry();
+        const cpuChartGeometry = new BufferGeometry();
         positions = new Float32Array( 60 * 3 );
 
         for ( let i = 0; i < 60; i ++ ) {
@@ -475,14 +477,15 @@ export class ThreePerfUI {
 
         positionAttribute = new BufferAttribute( positions, 3 );
         positionAttribute.usage = DynamicDrawUsage;
-        this._cpuChartGeometry.setAttribute( 'position', positionAttribute );
+        cpuChartGeometry.setAttribute( 'position', positionAttribute );
 
-        const cpuChart = new Line( this._cpuChartGeometry, new LineBasicMaterial({ color: 'rgb(66, 226, 46)' }) );
+        const cpuChart = new Line( cpuChartGeometry, new LineBasicMaterial({ color: 'rgb(66, 226, 46)' }) );
         this._scene.add( cpuChart );
+        this._charts.set( 'cpu', cpuChart );
 
         // fps chart
 
-        this._fpsChartGeometry = new BufferGeometry();
+        const fpsChartGeometry = new BufferGeometry();
         positions = new Float32Array( 60 * 3 );
 
         for ( let i = 0; i < 60; i ++ ) {
@@ -495,10 +498,11 @@ export class ThreePerfUI {
 
         positionAttribute = new BufferAttribute( positions, 3 );
         positionAttribute.usage = DynamicDrawUsage;
-        this._fpsChartGeometry.setAttribute( 'position', positionAttribute );
+        fpsChartGeometry.setAttribute( 'position', positionAttribute );
 
-        const fpsChart = new Line( this._fpsChartGeometry, new LineBasicMaterial({ color: 'rgb(238, 38, 110)' }) );
+        const fpsChart = new Line( fpsChartGeometry, new LineBasicMaterial({ color: 'rgb(238, 38, 110)' }) );
         this._scene.add( fpsChart );
+        this._charts.set( 'fps', fpsChart );
 
     };
 
@@ -506,22 +510,35 @@ export class ThreePerfUI {
 
         // update charts
 
-        const factor = 2;
+        if ( this._perf.chart && this._perf.showGraph ) {
 
-        if ( this._perf.chart ) {
+            for ( const chartName in this._perf.chart.data ) {
 
-            for ( let i = 0; i < this._perf.chart.data.gpu.length; i ++ ) {
+                const chartData = this._perf.chart.data[ chartName ];
+                if ( ! this._charts.get( chartName ) || ! chartData ) continue;
+                const geometry = this._charts.get( chartName )!.geometry as BufferGeometry;
+                const positionAttr = geometry.attributes.position;
 
-                let id = ( this._perf.chart.circularId + i + 1 ) % 60;
-                this._gpuChartGeometry.attributes.position.setY( i, this._perf.chart.data.gpu[ id ] * factor - 110 );
-                this._cpuChartGeometry.attributes.position.setY( i, this._perf.chart.data.cpu[ id ] * factor - 110 );
-                this._fpsChartGeometry.attributes.position.setY( i, this._perf.chart.data.fps[ id ] / 3 - 110 );
+                let maxValue = 0;
+
+                for ( let i = 0; i < chartData.length; i ++ ) {
+
+                    if ( chartData[ i ] > maxValue ) maxValue = chartData[ i ];
+
+                }
+
+                maxValue = Math.max( maxValue, 20 );
+
+                for ( let i = 0; i < chartData.length; i ++ ) {
+
+                    let id = ( this._perf.chart.circularId + i + 1 ) % 60;
+                    positionAttr.setY( i, chartData[ id ] / maxValue * 90 - 110 );
+
+                }
+
+                positionAttr.needsUpdate = true;
 
             }
-
-            this._gpuChartGeometry.attributes.position.needsUpdate = true;
-            this._cpuChartGeometry.attributes.position.needsUpdate = true;
-            this._fpsChartGeometry.attributes.position.needsUpdate = true;
 
         }
 
@@ -543,6 +560,36 @@ export class ThreePerfUI {
         // render
 
         this._renderer.render( this._scene, this._camera );
+
+    };
+
+    get width () : number {
+
+        return this._width;
+
+    };
+
+    set width ( value: number ) {
+
+        this._width = value;
+        this._camera.right = value;
+        this._camera.updateProjectionMatrix();
+        this._renderer.setSize( this._width, this._height );
+
+    };
+
+    get height () : number {
+
+        return this._height;
+
+    };
+
+    set height ( value: number ) {
+
+        this._height = value;
+        this._camera.bottom = - value;
+        this._camera.updateProjectionMatrix();
+        this._renderer.setSize( this._width, this._height );
 
     };
 

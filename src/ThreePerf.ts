@@ -14,6 +14,9 @@ interface IThreePerfProps {
     logsPerSecond?: number;
     deepAnalyze?:   boolean;
     scene:          Scene;
+    anchorX?:       'left' | 'right';
+    anchorY?:       'top' | 'bottom';
+    showGraph?:     boolean;
 };
 
 const updateMatrixWorldTemp = Object3D.prototype.updateMatrixWorld;
@@ -104,6 +107,10 @@ export class ThreePerf {
 
     threeRenderer: WebGLRenderer;
 
+    private _anchorX: 'left' | 'right';
+    private _anchorY: 'top' | 'bottom';
+    private _showGraph: boolean;
+
     //
 
     constructor ( props: IThreePerfProps ) {
@@ -113,6 +120,10 @@ export class ThreePerf {
         this.threeRenderer = props.renderer;
 
         this.ui = new ThreePerfUI({ perf: this, domElement: props.domElement });
+
+        this.anchorX = props.anchorX ?? 'left';
+        this.anchorY = props.anchorY ?? 'top';
+        this.showGraph = props.showGraph ?? true;
 
         //
 
@@ -332,6 +343,69 @@ export class ThreePerf {
             // todo
 
         }
+
+    };
+
+    //
+
+    get anchorX () {
+
+        return this._anchorX;
+
+    };
+
+    set anchorX ( value: 'left' | 'right' ) {
+
+        this._anchorX = value;
+
+        if ( this._anchorX === 'left' ) {
+
+            this.ui.wrapper.style.left = '0';
+            this.ui.wrapper.style.right = '';
+
+        } else {
+
+            this.ui.wrapper.style.left = '';
+            this.ui.wrapper.style.right = '0';
+
+        }
+
+    };
+
+    get anchorY () {
+
+        return this._anchorY;
+
+    };
+
+    set anchorY ( value: 'top' | 'bottom' ) {
+
+        this._anchorY = value;
+
+        if ( this._anchorY === 'top' ) {
+
+            this.ui.wrapper.style.top = '0';
+            this.ui.wrapper.style.bottom = '';
+
+        } else {
+
+            this.ui.wrapper.style.top = '';
+            this.ui.wrapper.style.bottom = '0';
+
+        }
+
+    };
+
+    get showGraph () {
+
+        return this._showGraph;
+
+    };
+
+    set showGraph ( value: boolean ) {
+
+        this._showGraph = value;
+        this.ui.height = 70;
 
     };
 
