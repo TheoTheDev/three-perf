@@ -35,7 +35,12 @@ window.onload = () => {
 
     }
 
-    const perfMonitor = new ThreePerf({ showGraph: false, scene, renderer: renderer, domElement: document.body } );
+    const perfMonitor = new ThreePerf({
+        showGraph: true,
+        scene,
+        renderer: renderer,
+        domElement: document.body
+    });
 
     //
 

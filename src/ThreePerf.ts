@@ -405,7 +405,7 @@ export class ThreePerf {
     set showGraph ( value: boolean ) {
 
         this._showGraph = value;
-        this.ui.height = 70;
+        this.ui.height = ( this._showGraph ? 110 : 70 );
 
     };
 
