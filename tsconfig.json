@@ -13,6 +13,7 @@
         "declaration": true,
         "emitDeclarationOnly": true,
         "forceConsistentCasingInFileNames": true,
+        "allowJs": true,
         "paths": {
             "three-perf": ["./src"],
             "three-perf/*": ["./src/*"]

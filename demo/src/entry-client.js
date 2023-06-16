@@ -9,7 +9,7 @@ window.onload = () => {
 
     const canvas = document.getElementById( 'renderport' );
 
-    const renderer = new THREE.WebGLRenderer({ canvas });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.setClearColor( 0x222222, 1 );
 
     const scene = new THREE.Scene();
@@ -22,10 +22,20 @@ window.onload = () => {
     spotLight.lookAt( 0, 0, 0 );
     scene.add( spotLight );
 
-    const cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
-    scene.add( cube );
+    const cubes = [];
 
-    const perfMonitor = new ThreePerf({ renderer: renderer, domElement: document.body } );
+    for ( let i = 0; i < 2000; i ++ ) {
+
+        const cube = new THREE.Mesh( new THREE.BoxGeometry( 0.2, 0.2, 0.2, 1, 1, 1 ), new THREE.MeshPhongMaterial({ transparent: true, opacity: 0.5, color: 0x00ff00 * Math.random() }) );
+        cube.position.set( ( Math.random() - 0.5 ) * 22, ( Math.random() - 0.5 ) * 22, ( Math.random() - 0.5 ) * 22 );
+        cube.rotation.x += Math.random() * Math.PI * 2;
+        cube.rotation.z += Math.random() * Math.PI * 2;
+        scene.add( cube );
+        cubes.push( cube );
+
+    }
+
+    const perfMonitor = new ThreePerf({ scene, renderer: renderer, domElement: document.body } );
 
     //
 
@@ -41,7 +51,13 @@ window.onload = () => {
 
         requestAnimationFrame( render );
 
-        cube.rotation.x += 0.01;
+        cubes.forEach( ( cube ) => {
+
+            cube.rotation.x += 0.01;
+            cube.rotation.z += 0.01;
+
+        });
+
         renderer.render( scene, camera );
 
     };

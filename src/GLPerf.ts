@@ -1,7 +1,7 @@
 
 import { MathUtils, WebGLRenderer } from 'three';
 
-import { ThreePerf } from 'three-perf';
+import { ThreePerf } from 'three-perf/ThreePerf';
 import { IChart, ILogsAccums } from './helpers/Types';
 
 declare global {
