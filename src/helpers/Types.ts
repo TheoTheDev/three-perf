@@ -3,7 +3,7 @@ import { Material, Mesh } from 'three';
 
 //
 
-type IDrawCount = {
+interface IDrawCount {
     type:           string;
     drawCount:      number;
 };

@@ -1,5 +1,5 @@
 
-import { MathUtils, WebGLRenderer } from 'three';
+import { MathUtils } from 'three';
 
 import { ThreePerf } from 'three-perf/ThreePerf';
 import { IChart, ILogsAccums } from './helpers/Types';
@@ -25,56 +25,56 @@ const average = ( arr: number[] ) => arr?.reduce( ( a: number, b: number ) => a 
 
 export class GLPerf {
 
-    names: string[] = [''];
-    finished: any[] = [];
-    gl: WebGL2RenderingContext;
-    extension: any;
-    query: any;
-    paused: boolean = false;
-    overClock: boolean = false;
-    queryHasResult: boolean = false;
-    queryCreated: boolean = false;
-    isWebGL2: boolean = true;
-    memAccums: number[] = [];
-    gpuAccums: number[] = [];
-    activeAccums: boolean[] = [];
-    logsAccums: ILogsAccums = {
+    public names: string[] = [''];
+    public finished: any[] = [];
+    public gl: WebGL2RenderingContext;
+    public extension: any;
+    public query: any;
+    public paused: boolean = false;
+    public overClock: boolean = false;
+    public queryHasResult: boolean = false;
+    public queryCreated: boolean = false;
+    public isWebGL2: boolean = true;
+    public memAccums: number[] = [];
+    public gpuAccums: number[] = [];
+    public activeAccums: boolean[] = [];
+    public logsAccums: ILogsAccums = {
         mem: [],
         gpu: [],
         cpu: [],
         fps: [],
         fpsFixed: []
     };
-    fpsChart: number[] = [];
-    gpuChart: number[] = [];
-    cpuChart: number[] = [];
-    memChart: number[] = [];
-    paramLogger: any = () => {};
-    glFinish: any = () => {};
-    chartLogger: any = () => {};
-    chartLen: number = 60;
-    logsPerSecond: number = 10;
-    maxMemory: number = 1500;
-    chartHz: number = 10;
-    startCpuProfiling: boolean = false;
-    lastCalculateFixed: number = 0;
-    chartFrame: number = 0;
-    gpuTimeProcess: number = 0;
-    chartTime: number = 0;
-    activeQueries: number = 0;
-    circularId: number = 0;
-    detected: number = 0;
-    frameId: number = 0;
-    rafId: number = 0;
-    idleCbId: number = 0;
-    checkQueryId: number = 0;
-    uuid: string | undefined = undefined;
-    currentCpu: number = 0;
-    currentMem: number = 0;
-    paramFrame: number = 0;
-    paramTime: number = 0;
-    now: any = () => {};
-    t0: number = 0;
+    public fpsChart: number[] = [];
+    public gpuChart: number[] = [];
+    public cpuChart: number[] = [];
+    public memChart: number[] = [];
+    public paramLogger: any = () => {};
+    public glFinish: any = () => {};
+    public chartLogger: any = () => {};
+    public chartLen: number = 60;
+    public logsPerSecond: number = 10;
+    public maxMemory: number = 1500;
+    public chartHz: number = 10;
+    public startCpuProfiling: boolean = false;
+    public lastCalculateFixed: number = 0;
+    public chartFrame: number = 0;
+    public gpuTimeProcess: number = 0;
+    public chartTime: number = 0;
+    public activeQueries: number = 0;
+    public circularId: number = 0;
+    public detected: number = 0;
+    public frameId: number = 0;
+    public rafId: number = 0;
+    public idleCbId: number = 0;
+    public checkQueryId: number = 0;
+    public uuid: string | undefined = undefined;
+    public currentCpu: number = 0;
+    public currentMem: number = 0;
+    public paramFrame: number = 0;
+    public paramTime: number = 0;
+    public now: any = () => {};
+    public t0: number = 0;
 
     public trackGPU: boolean;
 
@@ -105,7 +105,7 @@ export class GLPerf {
 
     };
 
-    initGpu () {
+    private initGpu () : void {
 
         this.uuid = MathUtils.generateUUID();
 
@@ -133,7 +133,7 @@ export class GLPerf {
      * 120hz device detection
      */
 
-    is120hz () {
+    private is120hz () : void {
 
         let n = 0;
 
@@ -163,7 +163,7 @@ export class GLPerf {
      * @param { string | undefined } name
      */
 
-    addUI ( name: string ) {
+    private addUI ( name: string ) : void {
 
         if ( this.names.indexOf( name ) === - 1 ) {
 
@@ -175,7 +175,7 @@ export class GLPerf {
 
     };
 
-    nextFps = ( d: any ) => {
+    public nextFps = ( d: any ) : void => {
 
         const goal = 1000 / 60;
         const elapsed = goal - d.timeRemaining();
@@ -202,7 +202,7 @@ export class GLPerf {
      * @param { any | undefined } now
      */
 
-    nextFrame = ( now: any ) => {
+    public nextFrame = ( now: any ) : void => {
 
         this.frameId ++;
         const t = now || this.now();
@@ -388,7 +388,7 @@ export class GLPerf {
 
     };
 
-    startGpu () {
+    private startGpu () : void {
 
         const gl = this.gl;
         const ext = this.extension;
@@ -455,7 +455,7 @@ export class GLPerf {
 
     };
 
-    endGpu () {
+    private endGpu () : void {
 
         // finish the query measurement
         const ext = this.extension;
@@ -473,7 +473,7 @@ export class GLPerf {
      * Begin named measurement
      * @param { string | undefined } name
      */
-    begin ( name: string ) {
+    public begin ( name: string ) : void {
 
         this.startGpu();
         this.updateAccums( name );
@@ -484,14 +484,14 @@ export class GLPerf {
      * End named measure
      * @param { string | undefined } name
      */
-    end ( name: string ) {
+    public end ( name: string ) : void {
 
         this.endGpu();
         this.updateAccums( name );
 
     };
 
-    updateAccums ( name: string ) {
+    private updateAccums ( name: string ) : void {
 
         let nameId = this.names.indexOf( name );
 

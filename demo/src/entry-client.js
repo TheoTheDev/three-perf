@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 
 import { ThreePerf } from 'three-perf';
+import { Pane } from 'tweakpane';
 
 //
 
@@ -23,26 +24,41 @@ window.onload = () => {
     scene.add( spotLight );
 
     const cubes = [];
-
-    for ( let i = 0; i < 2000; i ++ ) {
-
-        const cube = new THREE.Mesh( new THREE.BoxGeometry( 0.2, 0.2, 0.2, 1, 1, 1 ), new THREE.MeshPhongMaterial({ transparent: true, opacity: 0.5, color: 0x00ff00 * Math.random() }) );
-        cube.position.set( ( Math.random() - 0.5 ) * 22, ( Math.random() - 0.5 ) * 22, ( Math.random() - 0.5 ) * 22 );
-        cube.rotation.x += Math.random() * Math.PI * 2;
-        cube.rotation.z += Math.random() * Math.PI * 2;
-        scene.add( cube );
-        cubes.push( cube );
-
-    }
+    const cubesWrapper = new THREE.Object3D();
+    scene.add( cubesWrapper );
 
     const perfMonitor = new ThreePerf({
         showGraph: true,
         scene,
         renderer: renderer,
-        domElement: document.body
+        domElement: document.body,
+        scale: 2
     });
 
+    const gui = new Pane();
+    const params = {
+        cubeCount: 2000
+    };
+
     //
+
+    const regenateCubes = () => {
+
+        cubesWrapper.children.length = 0;
+        cubes.length = 0;
+
+        for ( let i = 0; i < params.cubeCount; i ++ ) {
+
+            const cube = new THREE.Mesh( new THREE.BoxGeometry( 0.2, 0.2, 0.2, 1, 1, 1 ), new THREE.MeshPhongMaterial({ transparent: true, opacity: 0.5, color: 0x00ff00 * Math.random() }) );
+            cube.position.set( ( Math.random() - 0.5 ) * 22, ( Math.random() - 0.5 ) * 22, ( Math.random() - 0.5 ) * 22 );
+            cube.rotation.x += Math.random() * Math.PI * 2;
+            cube.rotation.z += Math.random() * Math.PI * 2;
+            cubesWrapper.add( cube );
+            cubes.push( cube );
+
+        }
+
+    };
 
     const resize = () => {
 
@@ -67,8 +83,26 @@ window.onload = () => {
 
     };
 
+    //
+
+    const perfFolder = gui.addFolder({ title: 'ThreePerf' });
+    perfFolder.addInput( perfMonitor, 'visible', { label: 'Visible' } );
+    perfFolder.addInput( perfMonitor, 'enabled', { label: 'Enabled' } );
+    perfFolder.addInput( perfMonitor, 'anchorX', { label: 'xAnchor', options: { left: 'left', right: 'right' } });
+    perfFolder.addInput( perfMonitor, 'anchorY', { label: 'yAnchor', options: { top: 'top', bottom: 'bottom' } });
+    perfFolder.addInput( perfMonitor, 'memory', { label: 'Memory' } );
+    perfFolder.addInput( perfMonitor, 'showGraph', { label: 'Charts' } );
+    perfFolder.addInput( perfMonitor, 'scale', { label: 'Scale', min: 0.1, max: 2, step: 0.1 } );
+    perfFolder.addInput( perfMonitor, 'updates', { label: 'Updates', min: 1, max: 60, step: 1 } );
+
+    const exampleFolder = gui.addFolder({ title: 'Example' });
+    exampleFolder.addInput( params, 'cubeCount', { label: 'Cubes', min: 1, max: 10000, step: 1 } ).on( 'change', regenateCubes );
+
+    //
+
     window.addEventListener( 'resize', resize );
 
+    regenateCubes();
     resize();
     render();
 

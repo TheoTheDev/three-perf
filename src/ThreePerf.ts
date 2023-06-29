@@ -17,6 +17,11 @@ interface IThreePerfProps {
     anchorX?:       'left' | 'right';
     anchorY?:       'top' | 'bottom';
     showGraph?:     boolean;
+    scale?:         number;
+    memory?:        boolean;
+    enabled?:       boolean;
+    visible?:       boolean;
+    updates?:       number;
 };
 
 const updateMatrixWorldTemp = Object3D.prototype.updateMatrixWorld;
@@ -110,6 +115,10 @@ export class ThreePerf {
     private _anchorX: 'left' | 'right';
     private _anchorY: 'top' | 'bottom';
     private _showGraph: boolean;
+    private _memory: boolean;
+    private _scale: number;
+    private _visible: boolean;
+    private _enabled: boolean;
 
     //
 
@@ -121,13 +130,16 @@ export class ThreePerf {
 
         this.ui = new ThreePerfUI({ perf: this, domElement: props.domElement });
 
+        this._visible = props.visible ?? true;
+        this._enabled = props.enabled ?? true;
+        this.scale = props.scale ?? 1;
         this.anchorX = props.anchorX ?? 'left';
         this.anchorY = props.anchorY ?? 'top';
         this.showGraph = props.showGraph ?? true;
+        this.memory = props.memory ?? true;
 
         //
 
-        const logsPerSecond = props.logsPerSecond ?? 10;
         const overClock = props.overClock ?? true;
 
         this.perfEngine = new GLPerf({
@@ -136,7 +148,7 @@ export class ThreePerf {
             overClock:      overClock,
             chartLen:       120, // chart ? chart.length : 120,
             chartHz:        60, // chart ? chart.hz : 60,
-            logsPerSecond:  logsPerSecond || 10,
+            logsPerSecond:  props.logsPerSecond ?? 10,
             gl:             props.renderer.getContext() as WebGL2RenderingContext,
             chartLogger: ( chart: IChart ) => {
 
@@ -144,6 +156,8 @@ export class ThreePerf {
 
             },
             paramLogger: ( logger: any ) => {
+
+                if ( ! this._enabled ) return;
 
                 const log = {
                     maxMemory:      logger.maxMemory,
@@ -313,6 +327,8 @@ export class ThreePerf {
 
     private afterRender = () => {
 
+        if ( ! this._enabled ) return;
+
         if ( ! this.perfEngine.paused ) {
 
             this.perfEngine.nextFrame( window.performance.now() );
@@ -347,6 +363,31 @@ export class ThreePerf {
     };
 
     //
+
+    get enabled () {
+
+        return this._enabled;
+
+    };
+
+    set enabled ( value: boolean ) {
+
+        this._enabled = value;
+
+    };
+
+    get visible () {
+
+        return this._visible;
+
+    };
+
+    set visible ( value: boolean ) {
+
+        this._visible = value;
+        this.ui.toggleVisibility( value );
+
+    };
 
     get anchorX () {
 
@@ -405,7 +446,45 @@ export class ThreePerf {
     set showGraph ( value: boolean ) {
 
         this._showGraph = value;
-        this.ui.height = ( this._showGraph ? 110 : 70 );
+        this.ui.toggleCharts( value );
+
+    };
+
+    get memory () {
+
+        return this._memory;
+
+    };
+
+    set memory ( value: boolean ) {
+
+        this._memory = value;
+        this.ui.toggleMemoryInfo( value );
+
+    };
+
+    get scale () {
+
+        return this._scale;
+
+    };
+
+    set scale ( value: number ) {
+
+        this._scale = value;
+        this.ui.setScale( value );
+
+    };
+
+    get updates () {
+
+        return this.perfEngine.logsPerSecond;
+
+    };
+
+    set updates ( value: number ) {
+
+        this.perfEngine.logsPerSecond = value;
 
     };
 

@@ -12,17 +12,9 @@ export class ThreePerfUI {
     public wrapper: HTMLElement;
 
     private _perf: ThreePerf;
-    private _gpuValueLabel: Text;
-    private _cpuValueLabel: Text;
-    private _fpsValueLabel: Text;
-    private _callsValueLabel: Text;
-    private _trianglesValueLabel: Text;
-    private _geometriesValueLabel: Text;
-    private _texturesValueLabel: Text;
-    private _shadersValueLabel: Text;
-    private _linesValueLabel: Text;
-    private _pointsValueLabel: Text;
 
+    private _basicInfoElements: { [key:string]: Text };
+    private _memInfoElements: { [key:string]: Text };
     private _charts: Map<string, Line> = new Map();
 
     //
@@ -55,271 +47,15 @@ export class ThreePerfUI {
         this.canvas.style.position = 'absolute';
         this.wrapper.appendChild( this.canvas );
 
-        // gpu block
-
-        const gpuBlock = document.createElement( 'div' );
-        gpuBlock.style.position = 'absolute';
-        gpuBlock.style.top = '0';
-        gpuBlock.style.left = '0';
-        gpuBlock.style.width = '65px';
-        gpuBlock.style.height = '70px';
-        this.wrapper.appendChild( gpuBlock );
-
-        const gpuLabel = document.createElement( 'div' );
-        gpuLabel.style.position = 'absolute';
-        gpuLabel.style.textAlign = 'right';
-        gpuLabel.style.top = '22px';
-        gpuLabel.style.right = '0px';
-        gpuLabel.style.fontSize = '8px';
-        gpuLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        gpuLabel.style.color = 'rgb(253, 151, 31)';
-        gpuLabel.style.letterSpacing = '1px';
-        gpuLabel.style.fontWeight = '500';
-        gpuLabel.innerHTML = 'GPU';
-        gpuBlock.appendChild( gpuLabel );
-
-        const gpuMsLabel = document.createElement( 'div' );
-        gpuMsLabel.style.position = 'absolute';
-        gpuMsLabel.style.textAlign = 'right';
-        gpuMsLabel.style.top = '7px';
-        gpuMsLabel.style.right = '0px';
-        gpuMsLabel.style.fontSize = '9px';
-        gpuMsLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        gpuMsLabel.style.color = '#fff';
-        gpuMsLabel.style.letterSpacing = '1px';
-        gpuMsLabel.style.fontWeight = '500';
-        gpuMsLabel.innerHTML = 'ms';
-        gpuBlock.appendChild( gpuMsLabel );
-
-        // cpu block
-
-        const cpuBlock = document.createElement( 'div' );
-        cpuBlock.style.position = 'absolute';
-        cpuBlock.style.top = '0';
-        cpuBlock.style.left = '70px';
-        cpuBlock.style.width = '65px';
-        cpuBlock.style.height = '70px';
-        this.wrapper.appendChild( cpuBlock );
-
-        const cpuLabel = document.createElement( 'div' );
-        cpuLabel.style.position = 'absolute';
-        cpuBlock.style.textAlign = 'right';
-        cpuLabel.style.top = '22px';
-        cpuLabel.style.right = '0px';
-        cpuLabel.style.fontSize = '8px';
-        cpuLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        cpuLabel.style.color = 'rgb(66, 226, 46)';
-        cpuLabel.style.letterSpacing = '1px';
-        cpuLabel.style.fontWeight = '500';
-        cpuLabel.innerHTML = 'CPU';
-        cpuBlock.appendChild( cpuLabel );
-
-        const cpuMsLabel = document.createElement( 'div' );
-        cpuMsLabel.style.position = 'absolute';
-        cpuMsLabel.style.textAlign = 'right';
-        cpuMsLabel.style.top = '7px';
-        cpuMsLabel.style.right = '0px';
-        cpuMsLabel.style.fontSize = '9px';
-        cpuMsLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        cpuMsLabel.style.color = '#fff';
-        cpuMsLabel.style.letterSpacing = '1px';
-        cpuMsLabel.style.fontWeight = '500';
-        cpuMsLabel.innerHTML = 'ms';
-        cpuBlock.appendChild( cpuMsLabel );
-
-        // fps block
-
-        const fpsBlock = document.createElement( 'div' );
-        fpsBlock.style.position = 'absolute';
-        fpsBlock.style.top = '0';
-        fpsBlock.style.left = '140px';
-        fpsBlock.style.width = '45px';
-        fpsBlock.style.height = '70px';
-        this.wrapper.appendChild( fpsBlock );
-
-        const fpsLabel = document.createElement( 'div' );
-        fpsLabel.style.position = 'absolute';
-        fpsLabel.style.width = '100%';
-        fpsLabel.style.textAlign = 'right';
-        fpsLabel.style.top = '22px';
-        fpsLabel.style.left = '0px';
-        fpsLabel.style.fontSize = '8px';
-        fpsLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        fpsLabel.style.color = 'rgb(238, 38, 110)';
-        fpsLabel.style.letterSpacing = '1px';
-        fpsLabel.style.fontWeight = '500';
-        fpsLabel.innerHTML = 'FPS';
-        fpsBlock.appendChild( fpsLabel );
-
-        // calls block
-
-        const callsBlock = document.createElement( 'div' );
-        callsBlock.style.position = 'absolute';
-        callsBlock.style.top = '0';
-        callsBlock.style.left = '170px';
-        callsBlock.style.width = '65px';
-        callsBlock.style.height = '70px';
-        this.wrapper.appendChild( callsBlock );
-
-        const callsLabel = document.createElement( 'div' );
-        callsLabel.style.position = 'absolute';
-        callsLabel.style.width = '100%';
-        callsLabel.style.textAlign = 'right';
-        callsLabel.style.top = '22px';
-        callsLabel.style.right = '0px';
-        callsLabel.style.fontSize = '8px';
-        callsLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        callsLabel.style.color = 'rgb(101, 197, 188)';
-        callsLabel.style.letterSpacing = '1px';
-        callsLabel.style.fontWeight = '500';
-        callsLabel.innerHTML = 'calls';
-        callsBlock.appendChild( callsLabel );
-
-        // triangles block
-
-        const trianglesBlock = document.createElement( 'div' );
-        trianglesBlock.style.position = 'absolute';
-        trianglesBlock.style.top = '0';
-        trianglesBlock.style.left = '250px';
-        trianglesBlock.style.width = '65px';
-        trianglesBlock.style.height = '70px';
-        this.wrapper.appendChild( trianglesBlock );
-
-        const trianglesLabel = document.createElement( 'div' );
-        trianglesLabel.style.position = 'absolute';
-        trianglesLabel.style.width = '100%';
-        trianglesLabel.style.textAlign = 'right';
-        trianglesLabel.style.top = '22px';
-        trianglesLabel.style.right = '0px';
-        trianglesLabel.style.fontSize = '8px';
-        trianglesLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        trianglesLabel.style.color = 'rgb(101, 197, 188)';
-        trianglesLabel.style.letterSpacing = '1px';
-        trianglesLabel.style.fontWeight = '500';
-        trianglesLabel.innerHTML = 'triangles';
-        trianglesBlock.appendChild( trianglesLabel );
-
-        // geometries block
-
-        const geometriesBlock = document.createElement( 'div' );
-        geometriesBlock.style.position = 'absolute';
-        geometriesBlock.style.top = '30px';
-        geometriesBlock.style.left = '0px';
-        geometriesBlock.style.width = '65px';
-        geometriesBlock.style.height = '70px';
-        this.wrapper.appendChild( geometriesBlock );
-
-        const geometriesLabel = document.createElement( 'div' );
-        geometriesLabel.style.position = 'absolute';
-        geometriesLabel.style.width = '100%';
-        geometriesLabel.style.textAlign = 'right';
-        geometriesLabel.style.top = '22px';
-        geometriesLabel.style.right = '0px';
-        geometriesLabel.style.fontSize = '8px';
-        geometriesLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        geometriesLabel.style.color = 'rgb(101, 197, 188)';
-        geometriesLabel.style.letterSpacing = '1px';
-        geometriesLabel.style.fontWeight = '500';
-        geometriesLabel.innerHTML = 'geometries';
-        geometriesBlock.appendChild( geometriesLabel );
-
-        // textures block
-
-        const texturesBlock = document.createElement( 'div' );
-        texturesBlock.style.position = 'absolute';
-        texturesBlock.style.top = '30px';
-        texturesBlock.style.left = '70px';
-        texturesBlock.style.width = '65px';
-        texturesBlock.style.height = '70px';
-        this.wrapper.appendChild( texturesBlock );
-
-        const texturesLabel = document.createElement( 'div' );
-        texturesLabel.style.position = 'absolute';
-        texturesLabel.style.width = '100%';
-        texturesLabel.style.textAlign = 'right';
-        texturesLabel.style.top = '22px';
-        texturesLabel.style.right = '0px';
-        texturesLabel.style.fontSize = '8px';
-        texturesLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        texturesLabel.style.color = 'rgb(101, 197, 188)';
-        texturesLabel.style.letterSpacing = '1px';
-        texturesLabel.style.fontWeight = '500';
-        texturesLabel.innerHTML = 'textures';
-        texturesBlock.appendChild( texturesLabel );
-
-        // shaders block
-
-        const shadersBlock = document.createElement( 'div' );
-        shadersBlock.style.position = 'absolute';
-        shadersBlock.style.top = '30px';
-        shadersBlock.style.left = '140px';
-        shadersBlock.style.width = '65px';
-        shadersBlock.style.height = '70px';
-        this.wrapper.appendChild( shadersBlock );
-
-        const shadersLabel = document.createElement( 'div' );
-        shadersLabel.style.position = 'absolute';
-        shadersLabel.style.width = '100%';
-        shadersLabel.style.textAlign = 'right';
-        shadersLabel.style.top = '22px';
-        shadersLabel.style.right = '0px';
-        shadersLabel.style.fontSize = '8px';
-        shadersLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        shadersLabel.style.color = 'rgb(101, 197, 188)';
-        shadersLabel.style.letterSpacing = '1px';
-        shadersLabel.style.fontWeight = '500';
-        shadersLabel.innerHTML = 'shaders';
-        shadersBlock.appendChild( shadersLabel );
-
-        // lines block
-
-        const linesBlock = document.createElement( 'div' );
-        linesBlock.style.position = 'absolute';
-        linesBlock.style.top = '30px';
-        linesBlock.style.left = '210px';
-        linesBlock.style.width = '65px';
-        linesBlock.style.height = '70px';
-        this.wrapper.appendChild( linesBlock );
-
-        const linesLabel = document.createElement( 'div' );
-        linesLabel.style.position = 'absolute';
-        linesLabel.style.width = '100%';
-        linesLabel.style.textAlign = 'right';
-        linesLabel.style.top = '22px';
-        linesLabel.style.right = '0px';
-        linesLabel.style.fontSize = '8px';
-        linesLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        linesLabel.style.color = 'rgb(101, 197, 188)';
-        linesLabel.style.letterSpacing = '1px';
-        linesLabel.style.fontWeight = '500';
-        linesLabel.innerHTML = 'lines';
-        linesBlock.appendChild( linesLabel );
-
-        // lines block
-
-        const pointsBlock = document.createElement( 'div' );
-        pointsBlock.style.position = 'absolute';
-        pointsBlock.style.top = '30px';
-        pointsBlock.style.left = '280px';
-        pointsBlock.style.width = '65px';
-        pointsBlock.style.height = '70px';
-        this.wrapper.appendChild( pointsBlock );
-
-        const pointsLabel = document.createElement( 'div' );
-        pointsLabel.style.position = 'absolute';
-        pointsLabel.style.width = '100%';
-        pointsLabel.style.textAlign = 'right';
-        pointsLabel.style.top = '22px';
-        pointsLabel.style.right = '0px';
-        pointsLabel.style.fontSize = '8px';
-        pointsLabel.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        pointsLabel.style.color = 'rgb(101, 197, 188)';
-        pointsLabel.style.letterSpacing = '1px';
-        pointsLabel.style.fontWeight = '500';
-        pointsLabel.innerHTML = 'points';
-        pointsBlock.appendChild( pointsLabel );
+        //
 
         this.initCanvas();
+
+    };
+
+    public setScale ( value: number ) : void {
+
+        this._renderer.setSize( this._width * value, this._height * value );
 
     };
 
@@ -347,7 +83,26 @@ export class ThreePerfUI {
         gpuValue.color = 'rgb(253, 151, 31)';
         gpuValue.sync();
         this._scene.add( gpuValue );
-        this._gpuValueLabel = gpuValue;
+
+        const gpuMs = new Text();
+        gpuMs.anchorX = 'right';
+        gpuMs.position.set( 65, - 7, 0 );
+        gpuMs.text = 'ms';
+        gpuMs.fontSize = 9;
+        gpuMs.color = 'rgb(255, 255, 255)';
+        gpuMs.sync();
+        this._scene.add( gpuMs );
+
+        const gpuLabel = new Text();
+        gpuLabel.anchorX = 'right';
+        gpuLabel.position.set( 65, - 22, 0 );
+        gpuLabel.text = 'GPU';
+        gpuLabel.fontSize = 9;
+        gpuLabel.color = 'rgb(253, 151, 31)';
+        gpuLabel.sync();
+        this._scene.add( gpuLabel );
+
+        //
 
         const cpuValue = new Text();
         cpuValue.anchorX = 'right';
@@ -357,7 +112,26 @@ export class ThreePerfUI {
         cpuValue.color = 'rgb(66, 226, 46)';
         cpuValue.sync();
         this._scene.add( cpuValue );
-        this._cpuValueLabel = cpuValue;
+
+        const cpuMs = new Text();
+        cpuMs.anchorX = 'right';
+        cpuMs.position.set( 135, - 7, 0 );
+        cpuMs.text = 'ms';
+        cpuMs.fontSize = 9;
+        cpuMs.color = 'rgb(255, 255, 255)';
+        cpuMs.sync();
+        this._scene.add( cpuMs );
+
+        const cpuLabel = new Text();
+        cpuLabel.anchorX = 'right';
+        cpuLabel.position.set( 135, - 22, 0 );
+        cpuLabel.text = 'CPU';
+        cpuLabel.fontSize = 9;
+        cpuLabel.color = 'rgb(66, 226, 46)';
+        cpuLabel.sync();
+        this._scene.add( cpuLabel );
+
+        //
 
         const fpsValue = new Text();
         fpsValue.anchorX = 'center';
@@ -367,7 +141,17 @@ export class ThreePerfUI {
         fpsValue.color = 'rgb(238, 38, 110)';
         fpsValue.sync();
         this._scene.add( fpsValue );
-        this._fpsValueLabel = fpsValue;
+
+        const fpsLabel = new Text();
+        fpsLabel.anchorX = 'center';
+        fpsLabel.position.set( 175, - 22, 0 );
+        fpsLabel.text = 'FPS';
+        fpsLabel.fontSize = 9;
+        fpsLabel.color = 'rgb(238, 38, 110)';
+        fpsLabel.sync();
+        this._scene.add( fpsLabel );
+
+        //
 
         const callsValue = new Text();
         callsValue.anchorX = 'right';
@@ -377,7 +161,17 @@ export class ThreePerfUI {
         callsValue.color = '#ffffff';
         callsValue.sync();
         this._scene.add( callsValue );
-        this._callsValueLabel = callsValue;
+
+        const callsLabel = new Text();
+        callsLabel.anchorX = 'right';
+        callsLabel.position.set( 235, - 22, 0 );
+        callsLabel.text = 'calls';
+        callsLabel.fontSize = 9;
+        callsLabel.color = 'rgb(101, 197, 188)';
+        callsLabel.sync();
+        this._scene.add( callsLabel );
+
+        //
 
         const trianglesValue = new Text();
         trianglesValue.anchorX = 'right';
@@ -387,7 +181,27 @@ export class ThreePerfUI {
         trianglesValue.color = '#ffffff';
         trianglesValue.sync();
         this._scene.add( trianglesValue );
-        this._trianglesValueLabel = trianglesValue;
+
+        const trianglesLabel = new Text();
+        trianglesLabel.anchorX = 'right';
+        trianglesLabel.position.set( 315, - 22, 0 );
+        trianglesLabel.text = 'triangles';
+        trianglesLabel.fontSize = 9;
+        trianglesLabel.color = 'rgb(101, 197, 188)';
+        trianglesLabel.sync();
+        this._scene.add( trianglesLabel );
+
+        //
+
+        this._basicInfoElements = {
+            gpuValue:           gpuValue,
+            cpuValue:           cpuValue,
+            fpsValue:           fpsValue,
+            callsValue:         callsValue,
+            trianglesValue:     trianglesValue
+        };
+
+        //
 
         const geometriesValue = new Text();
         geometriesValue.anchorX = 'right';
@@ -397,7 +211,17 @@ export class ThreePerfUI {
         geometriesValue.color = '#ffffff';
         geometriesValue.sync();
         this._scene.add( geometriesValue );
-        this._geometriesValueLabel = geometriesValue;
+
+        const geometriesLabel = new Text();
+        geometriesLabel.anchorX = 'right';
+        geometriesLabel.position.set( 65, - 53, 0 );
+        geometriesLabel.text = 'geometries';
+        geometriesLabel.fontSize = 9;
+        geometriesLabel.color = 'rgb(101, 197, 188)';
+        geometriesLabel.sync();
+        this._scene.add( geometriesLabel );
+
+        //
 
         const texturesValue = new Text();
         texturesValue.anchorX = 'right';
@@ -407,7 +231,17 @@ export class ThreePerfUI {
         texturesValue.color = '#ffffff';
         texturesValue.sync();
         this._scene.add( texturesValue );
-        this._texturesValueLabel = texturesValue;
+
+        const texturesLabel = new Text();
+        texturesLabel.anchorX = 'right';
+        texturesLabel.position.set( 135, - 53, 0 );
+        texturesLabel.text = 'textures';
+        texturesLabel.fontSize = 9;
+        texturesLabel.color = 'rgb(101, 197, 188)';
+        texturesLabel.sync();
+        this._scene.add( texturesLabel );
+
+        //
 
         const shadersValue = new Text();
         shadersValue.anchorX = 'right';
@@ -417,7 +251,17 @@ export class ThreePerfUI {
         shadersValue.color = '#ffffff';
         shadersValue.sync();
         this._scene.add( shadersValue );
-        this._shadersValueLabel = shadersValue;
+
+        const shadersLabel = new Text();
+        shadersLabel.anchorX = 'right';
+        shadersLabel.position.set( 205, - 53, 0 );
+        shadersLabel.text = 'shaders';
+        shadersLabel.fontSize = 9;
+        shadersLabel.color = 'rgb(101, 197, 188)';
+        shadersLabel.sync();
+        this._scene.add( shadersLabel );
+
+        //
 
         const linesValue = new Text();
         linesValue.anchorX = 'right';
@@ -427,7 +271,17 @@ export class ThreePerfUI {
         linesValue.color = '#ffffff';
         linesValue.sync();
         this._scene.add( linesValue );
-        this._linesValueLabel = linesValue;
+
+        const linesLabel = new Text();
+        linesLabel.anchorX = 'right';
+        linesLabel.position.set( 275, - 53, 0 );
+        linesLabel.text = 'lines';
+        linesLabel.fontSize = 9;
+        linesLabel.color = 'rgb(101, 197, 188)';
+        linesLabel.sync();
+        this._scene.add( linesLabel );
+
+        //
 
         const pointsValue = new Text();
         pointsValue.anchorX = 'right';
@@ -437,7 +291,34 @@ export class ThreePerfUI {
         pointsValue.color = '#ffffff';
         pointsValue.sync();
         this._scene.add( pointsValue );
-        this._pointsValueLabel = pointsValue;
+
+        const pointsLabel = new Text();
+        pointsLabel.anchorX = 'right';
+        pointsLabel.position.set( 345, - 53, 0 );
+        pointsLabel.text = 'points';
+        pointsLabel.fontSize = 9;
+        pointsLabel.color = 'rgb(101, 197, 188)';
+        pointsLabel.sync();
+        this._scene.add( pointsLabel );
+
+        //
+
+        this._memInfoElements = {
+            geometriesValue:        geometriesValue,
+            geometriesLabel:        geometriesLabel,
+
+            texturesValue:          texturesValue,
+            texturesLabel:          texturesLabel,
+
+            shadersValue:           shadersValue,
+            shadersLabel:           shadersLabel,
+
+            linesValue:             linesValue,
+            linesLabel:             linesLabel,
+
+            pointsValue:            pointsValue,
+            pointsLabel:            pointsLabel
+        };
 
         // init charts
 
@@ -532,7 +413,7 @@ export class ThreePerfUI {
                 for ( let i = 0; i < chartData.length; i ++ ) {
 
                     let id = ( this._perf.chart.circularId + i + 1 ) % 60;
-                    positionAttr.setY( i, chartData[ id ] / maxValue * 90 - 110 );
+                    positionAttr.setY( i, ( chartData[ id ] / maxValue * 90 - 110 ) * this.height / 110 );
 
                 }
 
@@ -544,24 +425,80 @@ export class ThreePerfUI {
 
         // update labels
 
-        this._gpuValueLabel.text = this._perf.log.gpu.toFixed( 3 );
-        this._cpuValueLabel.text = this._perf.log.cpu.toFixed( 3 );
-        this._fpsValueLabel.text = this._perf.log.fps.toFixed( 0 );
+        this._basicInfoElements.gpuValue.text = this._perf.log.gpu.toFixed( 3 );
+        this._basicInfoElements.cpuValue.text = this._perf.log.cpu.toFixed( 3 );
+        this._basicInfoElements.fpsValue.text = this._perf.log.fps.toFixed( 0 );
+        this._basicInfoElements.callsValue.text = this._perf.threeRenderer.info.render.calls.toString();
+        this._basicInfoElements.trianglesValue.text = this._perf.threeRenderer.info.render.triangles.toString();
 
-        this._callsValueLabel.text = this._perf.threeRenderer.info.render.calls.toString();
-        this._trianglesValueLabel.text = this._perf.threeRenderer.info.render.triangles.toString();
-
-        this._geometriesValueLabel.text = this._perf.threeRenderer.info.memory.geometries.toString();
-        this._texturesValueLabel.text = this._perf.threeRenderer.info.memory.textures.toString();
-        this._shadersValueLabel.text = this._perf.threeRenderer.info.programs?.length.toString() ?? '';
-        this._linesValueLabel.text = this._perf.threeRenderer.info.render.lines.toString();
-        this._pointsValueLabel.text = this._perf.threeRenderer.info.render.points.toString();
+        this._memInfoElements.geometriesValue.text = this._perf.threeRenderer.info.memory.geometries.toString();
+        this._memInfoElements.texturesValue.text = this._perf.threeRenderer.info.memory.textures.toString();
+        this._memInfoElements.shadersValue.text = this._perf.threeRenderer.info.programs?.length.toString() ?? '';
+        this._memInfoElements.linesValue.text = this._perf.threeRenderer.info.render.lines.toString();
+        this._memInfoElements.pointsValue.text = this._perf.threeRenderer.info.render.points.toString();
 
         // render
 
         this._renderer.render( this._scene, this._camera );
 
     };
+
+    //
+
+    public toggleVisibility ( value: boolean ) : void {
+
+        this.wrapper.style.display = value ? 'block' : 'none';
+
+    };
+
+    public toggleCharts ( value: boolean ) : void {
+
+        this._charts.forEach( ( chart ) => {
+
+            chart.visible = value;
+
+        });
+
+        if ( this._perf.showGraph ) {
+
+            this.height = ( this._perf.memory ? 110 : 70 );
+
+        } else {
+
+            this.height = ( this._perf.memory ? 70 : 40 );
+
+        }
+
+        this.wrapper.style.height = this.height + 'px';
+
+    };
+
+    public toggleMemoryInfo ( value: boolean ) : void {
+
+        for ( const key in this._memInfoElements ) {
+
+            this._memInfoElements[ key ].visible = value;
+
+        }
+
+        this.width = ( value ? 350 : 320 );
+
+        if ( this._perf.showGraph ) {
+
+            this.height = ( this._perf.memory ? 110 : 70 );
+
+        } else {
+
+            this.height = ( this._perf.memory ? 70 : 40 );
+
+        }
+
+        this.wrapper.style.width = this.width + 'px';
+        this.wrapper.style.height = this.height + 'px';
+
+    };
+
+    //
 
     get width () : number {
 
