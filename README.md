@@ -3,13 +3,14 @@
 
 **[Changelog](https://github.com/TheoTheDev/three-perf/blob/main/CHANGELOG.md)**
 
+Easily monitor the performances of your vanilla threeJS application.
+
 <table>
   <tr>
-    <td>Add the Perf component anywhere in your Canvas.</td>
+    <td><a href="https://codesandbox.io/s/zen-khorana-xkj9zp?file=/src/index.js">Add the ThreePerf component anywhere in your Canvas [example].</a></td>
     <td>
-<a href="https://wtp9t.csb.app/">
-  <img src="https://user-images.githubusercontent.com/15867665/215722804-3b4ee71c-d205-429b-8cae-f915bf60d56c.png" /></td>
-</a>
+      <img width="1412" alt="Screenshot 2023-07-19 at 15 59 45" src="https://github.com/TheoTheDev/three-perf/assets/1478866/f6afeb4c-3d61-4172-bcb6-131347d2d44e">
+    </td>
   </tr>
 </table>
 
@@ -65,3 +66,6 @@ function () {
 ### Maintainers :
 
 - [`twitter 🐈‍⬛ @theo_the_dev`](https://twitter.com/theo_the_dev)
+
+### Thanks
+To [`twitter @utsuboco`](https://twitter.com/utsuboco) [this is port from r3f/pref to vanilla]
