@@ -7,11 +7,9 @@ Easily monitor the performances of your vanilla threeJS application.
 
 <table>
   <tr>
-    <td>Add the ThreePerf component anywhere in your Canvas.</td>
+    <td><a href="https://codesandbox.io/s/zen-khorana-xkj9zp?file=/src/index.js">Add the ThreePerf component anywhere in your Canvas [example].</a></td>
     <td>
-      <a href="https://wtp9t.csb.app/">
-        <img src="https://github.com/TheoTheDev/three-perf/assets/1478866/66646a6a-f518-4b6d-bf11-91881b5e9be8"/>
-      </a>
+      <img width="1412" alt="Screenshot 2023-07-19 at 15 59 45" src="https://github.com/TheoTheDev/three-perf/assets/1478866/f6afeb4c-3d61-4172-bcb6-131347d2d44e">
     </td>
   </tr>
 </table>
