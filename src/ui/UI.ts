@@ -23,7 +23,7 @@ export class ThreePerfUI {
     private _scene: Scene;
     private _camera: OrthographicCamera;
 
-    private _width: number = 370;
+    private _width: number = 400;
     private _height: number = 110;
 
     //
@@ -37,13 +37,13 @@ export class ThreePerfUI {
         this.wrapper.style.position = 'fixed';
         this.wrapper.style.bottom = '0';
         this.wrapper.style.left = '0';
-        this.wrapper.style.width = '370px';
-        this.wrapper.style.height = '110px';
+        this.wrapper.style.width = this._width + 'px';
+        this.wrapper.style.height = this._height + 'px';
         props.domElement.appendChild( this.wrapper );
 
         this.canvas = document.createElement( 'canvas' );
-        this.canvas.width = 370;
-        this.canvas.height = 110;
+        this.canvas.width = this._width;
+        this.canvas.height = this._height;
         this.canvas.style.position = 'absolute';
         this.wrapper.appendChild( this.canvas );
 
@@ -55,7 +55,9 @@ export class ThreePerfUI {
 
     public setScale ( value: number ) : void {
 
-        this._renderer.setSize( this._width * value, this._height * value );
+        this.wrapper.style.width = value * this.width + 'px';
+        this.wrapper.style.height = value * this.height + 'px';
+        this._renderer.setSize( this._width * value, this._height * value, true );
 
     };
 
@@ -64,9 +66,8 @@ export class ThreePerfUI {
         this._renderer = new WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
         this._renderer.setClearColor( 0x000000, 0.5 );
         this._renderer.setPixelRatio( window.devicePixelRatio );
-        this._renderer.setSize( 370, 110 );
         this._scene = new Scene();
-        this._camera = new OrthographicCamera( 0, 370, 0, - 110, 0.1, 100 );
+        this._camera = new OrthographicCamera( 0, this._width, 0, - this._height, 0.1, 100 );
         this._camera.position.set( 0, 0, 10 )
         this._camera.lookAt( 0, 0, 0 );
         this._camera.updateProjectionMatrix();
@@ -193,12 +194,33 @@ export class ThreePerfUI {
 
         //
 
+        const renderpassesValue = new Text();
+        renderpassesValue.anchorX = 'right';
+        renderpassesValue.position.set( 365, - 8, 0 );
+        renderpassesValue.text = '0';
+        renderpassesValue.fontSize = 15;
+        renderpassesValue.color = '#ffffff';
+        renderpassesValue.sync();
+        this._scene.add( renderpassesValue );
+
+        const renderpassesLabel = new Text();
+        renderpassesLabel.anchorX = 'right';
+        renderpassesLabel.position.set( 365, - 22, 0 );
+        renderpassesLabel.text = 'passes';
+        renderpassesLabel.fontSize = 9;
+        renderpassesLabel.color = 'rgb(101, 197, 188)';
+        renderpassesLabel.sync();
+        this._scene.add( renderpassesLabel );
+
+        //
+
         this._basicInfoElements = {
             gpuValue:           gpuValue,
             cpuValue:           cpuValue,
             fpsValue:           fpsValue,
             callsValue:         callsValue,
-            trianglesValue:     trianglesValue
+            trianglesValue:     trianglesValue,
+            renderpassesValue:  renderpassesValue
         };
 
         //
@@ -329,7 +351,7 @@ export class ThreePerfUI {
 
         for ( let i = 0; i < 60; i ++ ) {
 
-            positions[ 3 * i + 0 ] = 370 / 59 * i;
+            positions[ 3 * i + 0 ] = this._width / 59 * i;
             positions[ 3 * i + 1 ] = - 110;
             positions[ 3 * i + 2 ] = 0;
 
@@ -350,7 +372,7 @@ export class ThreePerfUI {
 
         for ( let i = 0; i < 60; i ++ ) {
 
-            positions[ 3 * i + 0 ] = 370 / 59 * i;
+            positions[ 3 * i + 0 ] = this._width / 59 * i;
             positions[ 3 * i + 1 ] = - 110;
             positions[ 3 * i + 2 ] = 0;
 
@@ -371,7 +393,7 @@ export class ThreePerfUI {
 
         for ( let i = 0; i < 60; i ++ ) {
 
-            positions[ 3 * i + 0 ] = 370 / 59 * i;
+            positions[ 3 * i + 0 ] = this._width / 59 * i;
             positions[ 3 * i + 1 ] = - 110;
             positions[ 3 * i + 2 ] = 0;
 
@@ -430,6 +452,7 @@ export class ThreePerfUI {
         this._basicInfoElements.fpsValue.text = this._perf.log.fps.toFixed( 0 );
         this._basicInfoElements.callsValue.text = this._perf.threeRenderer.info.render.calls.toString();
         this._basicInfoElements.trianglesValue.text = this._perf.threeRenderer.info.render.triangles.toString();
+        this._basicInfoElements.renderpassesValue.text = this._perf.renderPassesNumber.toString();
 
         this._memInfoElements.geometriesValue.text = this._perf.threeRenderer.info.memory.geometries.toString();
         this._memInfoElements.texturesValue.text = this._perf.threeRenderer.info.memory.textures.toString();
@@ -440,6 +463,12 @@ export class ThreePerfUI {
         // render
 
         this._renderer.render( this._scene, this._camera );
+
+    };
+
+    public dispose () : void {
+
+        this.wrapper.remove();
 
     };
 
@@ -469,7 +498,7 @@ export class ThreePerfUI {
 
         }
 
-        this.wrapper.style.height = this.height + 'px';
+        this.wrapper.style.height = this._perf.scale * this.height + 'px';
 
     };
 
@@ -481,7 +510,7 @@ export class ThreePerfUI {
 
         }
 
-        this.width = ( value ? 350 : 320 );
+        this.width = 380; // ( value ? 350 : 320 );
 
         if ( this._perf.showGraph ) {
 
@@ -493,8 +522,8 @@ export class ThreePerfUI {
 
         }
 
-        this.wrapper.style.width = this.width + 'px';
-        this.wrapper.style.height = this.height + 'px';
+        this.wrapper.style.width = this._perf.scale * this.width + 'px';
+        this.wrapper.style.height = this._perf.scale * this.height + 'px';
 
     };
 
@@ -511,7 +540,7 @@ export class ThreePerfUI {
         this._width = value;
         this._camera.right = value;
         this._camera.updateProjectionMatrix();
-        this._renderer.setSize( this._width, this._height );
+        this._renderer.setSize( this._perf.scale * this._width, this._perf.scale * this._height );
 
     };
 
@@ -526,7 +555,7 @@ export class ThreePerfUI {
         this._height = value;
         this._camera.bottom = - value;
         this._camera.updateProjectionMatrix();
-        this._renderer.setSize( this._width, this._height );
+        this._renderer.setSize( this._perf.scale * this._width, this._perf.scale * this._height );
 
     };
 

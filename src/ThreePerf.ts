@@ -1,5 +1,6 @@
 
-import { Mesh, Object3D, Scene, WebGLRenderer } from 'three';
+import { Pane } from 'tweakpane';
+import { Camera, Mesh, Object3D, Scene, WebGLRenderer } from 'three';
 
 import { ThreePerfUI } from './ui/UI';
 import { GLPerf } from './GLPerf';
@@ -22,6 +23,8 @@ interface IThreePerfProps {
     enabled?:       boolean;
     visible?:       boolean;
     updates?:       number;
+    actionToCallUI?: string;
+    guiVisible?:    boolean;
 };
 
 const updateMatrixWorldTemp = Object3D.prototype.updateMatrixWorld;
@@ -34,6 +37,9 @@ const maxLog = [ 'gpu', 'cpu', 'mem', 'fps' ];
 //
 
 export class ThreePerf {
+
+    public gui = new Pane();
+    public guiFolder: any;
 
     public ui: ThreePerfUI;
     private perfEngine: GLPerf;
@@ -94,23 +100,23 @@ export class ThreePerf {
             },
         }
     };
-    chart: {
+    public chart: {
         data: {
             [index: string]:    number[];
         };
         circularId:             number;
     };
-    infos: {
+    public infos: {
         version:        string;
         renderer:       string;
         vendor:         string;
     };
-    gl: WebGLRenderer;
-    scene: Scene;
-    programs: IProgramsPerfs;
-    objectWithMaterials: Mesh[];
+    public gl: WebGLRenderer;
+    public programs: IProgramsPerfs;
+    public objectWithMaterials: Mesh[];
+    public renderPassesNumber: number = 0;
 
-    threeRenderer: WebGLRenderer;
+    public threeRenderer: WebGLRenderer;
 
     private _anchorX: 'left' | 'right';
     private _anchorY: 'top' | 'bottom';
@@ -119,12 +125,17 @@ export class ThreePerf {
     private _scale: number;
     private _visible: boolean;
     private _enabled: boolean;
+    private _keypressed: string = '';
+    private _guiVisible: boolean = true;
+
+    public actionToCallUI: string = 'dev';
+
+    private rendererRender: ( scene: Scene, camera: Camera ) => void;
 
     //
 
     constructor ( props: IThreePerfProps ) {
 
-        this.scene = props.scene;
         this.deepAnalyze = props.deepAnalyze ?? false;
         this.threeRenderer = props.renderer;
 
@@ -137,6 +148,10 @@ export class ThreePerf {
         this.anchorY = props.anchorY ?? 'top';
         this.showGraph = props.showGraph ?? true;
         this.memory = props.memory ?? true;
+        this.actionToCallUI = props.actionToCallUI ?? 'devmode';
+        this.guiVisible = props.guiVisible ?? true;
+
+        window.addEventListener( 'keypress', this.keypressHandler );
 
         //
 
@@ -215,9 +230,6 @@ export class ThreePerf {
 
                 // TODO CONVERT TO OBJECT AND VALUE ALWAYS 0 THIS IS NOT CALL
                 this.accumulated = accumulated;
-
-                // emitEvent('log', [log, gl])
-                // tmp
                 this.ui.update();
 
             }
@@ -261,61 +273,29 @@ export class ThreePerf {
             vendor:     glVendor
         };
 
-        const callbacks = new Map();
-        const callbacksAfter = new Map();
-        const scope = this;
+        this.rendererRender = this.threeRenderer.render;
+        this.threeRenderer.info.autoReset = false;
 
-        Object.defineProperty( Scene.prototype, 'onBeforeRender', {
-            get () {
+        this.threeRenderer.render = ( scene: Scene, camera: Camera ) => {
 
-                return ( ...args: any ) => {
+            this.renderPassesNumber ++;
+            this.rendererRender.call( this.threeRenderer, scene, camera );
 
-                    if ( this.userData.useStats !== false ) {
+        };
 
-                        if ( scope.perfEngine ) {
+        // add three perf pane
 
-                            scope.perfEngine.begin( 'profiler' );
-
-                        }
-
-                    }
-
-                    callbacks.get( this )?.( ...args );
-
-                };
-
-            },
-            set( callback ) {
-
-                callbacks.set( this, callback );
-
-            },
-            configurable: true
-        });
-
-        Object.defineProperty( Scene.prototype, 'onAfterRender', {
-            get () {
-
-                return ( ...args: any ) => {
-
-                    if ( this.userData.useStats !== false ) {
-
-                        scope.afterRender();
-
-                    }
-
-                    callbacksAfter.get( this )?.( ...args );
-
-                };
-
-            },
-            set ( callback ) {
-
-                callbacksAfter.set( this, callback );
-
-            },
-            configurable: true
-        });
+        // @ts-ignore
+        this.guiFolder = this.gui.addFolder({ title: 'Settings' });
+        const perfFolder = this.guiFolder.addFolder({ title: 'ThreePerf' });
+        perfFolder.addInput( this, 'visible', { label: 'Visible' } );
+        perfFolder.addInput( this, 'enabled', { label: 'Enabled' } );
+        perfFolder.addInput( this, 'anchorX', { label: 'xAnchor', options: { left: 'left', right: 'right' } });
+        perfFolder.addInput( this, 'anchorY', { label: 'yAnchor', options: { top: 'top', bottom: 'bottom' } });
+        perfFolder.addInput( this, 'memory', { label: 'Memory' } );
+        perfFolder.addInput( this, 'showGraph', { label: 'Charts' } );
+        perfFolder.addInput( this, 'scale', { label: 'Scale', min: 0.1, max: 2, step: 0.1 } );
+        perfFolder.addInput( this, 'updates', { label: 'Updates', min: 1, max: 60, step: 1 } );
 
         //
 
@@ -323,7 +303,49 @@ export class ThreePerf {
 
     };
 
+    public begin () {
+
+        this.perfEngine.begin( 'profiler' );
+
+    };
+
+    public end () {
+
+        this.afterRender();
+        this.renderPassesNumber = 0;
+        this.threeRenderer.info.reset();
+
+    };
+
+    public dispose () {
+
+        this.ui.dispose();
+        this.gui.element.parentElement?.remove();
+        window.removeEventListener( 'keypress', this.keypressHandler );
+
+    };
+
     //
+
+    private keypressHandler = ( event: KeyboardEvent ) : void => {
+
+        this._keypressed += event.key;
+        const keys = this._keypressed.split('');
+
+        while ( keys.length > this.actionToCallUI.length ) {
+
+            keys.shift();
+
+        }
+
+        if ( keys.join('') === this.actionToCallUI ) {
+
+            this._keypressed = '';
+            this.guiVisible = ! this.guiVisible;
+
+        }
+
+    };
 
     private afterRender = () => {
 
@@ -386,6 +408,19 @@ export class ThreePerf {
 
         this._visible = value;
         this.ui.toggleVisibility( value );
+
+    };
+
+    get guiVisible () {
+
+        return this._guiVisible;
+
+    };
+
+    set guiVisible ( value: boolean ) {
+
+        this._guiVisible = value;
+        this.gui.element.parentElement!.style['display'] = value ? 'block' : 'none';
 
     };
 

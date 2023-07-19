@@ -1,5 +1,5 @@
 
-declare namespace Stats {
+declare namespace Troika {
     class Text extends THREE.Object3D {
         text: string;
         anchorX: string;
@@ -11,5 +11,5 @@ declare namespace Stats {
 }
 
 declare module 'troika-three-text' {
-    export = Stats;
+    export = Troika;
 }
