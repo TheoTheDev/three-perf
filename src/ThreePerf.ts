@@ -14,7 +14,6 @@ interface IThreePerfProps {
     overClock?:     boolean;
     logsPerSecond?: number;
     deepAnalyze?:   boolean;
-    scene:          Scene;
     anchorX?:       'left' | 'right';
     anchorY?:       'top' | 'bottom';
     showGraph?:     boolean;
