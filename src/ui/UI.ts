@@ -25,12 +25,14 @@ export class ThreePerfUI {
 
     private _width: number = 400;
     private _height: number = 110;
+    public _backgroundOpacity: number = 0.7;
 
     //
 
-    constructor ( props: { perf: ThreePerf, domElement: HTMLElement } ) {
+    constructor ( props: { perf: ThreePerf, domElement: HTMLElement, backgroundOpacity?: number } ) {
 
         this._perf = props.perf;
+        this._backgroundOpacity = props.backgroundOpacity ?? this._backgroundOpacity;
 
         this.wrapper = document.createElement( 'div' );
         this.wrapper.id = 'three-perf-ui';
@@ -64,7 +66,7 @@ export class ThreePerfUI {
     public initCanvas () : void {
 
         this._renderer = new WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
-        this._renderer.setClearColor( 0x000000, 0.5 );
+        this._renderer.setClearColor( 0x000000, this._backgroundOpacity );
         this._renderer.setPixelRatio( window.devicePixelRatio );
         this._scene = new Scene();
         this._camera = new OrthographicCamera( 0, this._width, 0, - this._height, 0.1, 100 );
@@ -462,6 +464,12 @@ export class ThreePerfUI {
 
         // render
 
+        this.render();
+
+    };
+
+    private render () {
+
         this._renderer.render( this._scene, this._camera );
 
     };
@@ -527,6 +535,14 @@ export class ThreePerfUI {
 
     };
 
+    public setBackgroundOpacity ( value: number ) : void {
+
+        this._backgroundOpacity = value;
+        this._renderer.setClearColor( 0x000000, this._backgroundOpacity );
+        this.render();
+
+    };
+
     //
 
     get width () : number {
@@ -541,6 +557,7 @@ export class ThreePerfUI {
         this._camera.right = value;
         this._camera.updateProjectionMatrix();
         this._renderer.setSize( this._perf.scale * this._width, this._perf.scale * this._height );
+        this.render();
 
     };
 
@@ -556,6 +573,7 @@ export class ThreePerfUI {
         this._camera.bottom = - value;
         this._camera.updateProjectionMatrix();
         this._renderer.setSize( this._perf.scale * this._width, this._perf.scale * this._height );
+        this.render();
 
     };
 

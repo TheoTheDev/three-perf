@@ -1,6 +1,6 @@
 {
   "name": "three-perf",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "description": "Easily monitor your vanilla ThreeJS app performances.",
   "keywords": [
     "three",

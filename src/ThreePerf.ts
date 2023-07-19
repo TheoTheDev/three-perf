@@ -9,21 +9,22 @@ import { IChart, IGLLogger, ILogger, IProgramsPerfs } from './helpers/Types';
 //
 
 interface IThreePerfProps {
-    renderer:       THREE.WebGLRenderer;
-    domElement:     HTMLElement;
-    overClock?:     boolean;
-    logsPerSecond?: number;
-    deepAnalyze?:   boolean;
-    anchorX?:       'left' | 'right';
-    anchorY?:       'top' | 'bottom';
-    showGraph?:     boolean;
-    scale?:         number;
-    memory?:        boolean;
-    enabled?:       boolean;
-    visible?:       boolean;
-    updates?:       number;
-    actionToCallUI?: string;
-    guiVisible?:    boolean;
+    renderer:           THREE.WebGLRenderer;
+    domElement:         HTMLElement;
+    overClock?:         boolean;
+    logsPerSecond?:     number;
+    deepAnalyze?:       boolean;
+    anchorX?:           'left' | 'right';
+    anchorY?:           'top' | 'bottom';
+    showGraph?:         boolean;
+    scale?:             number;
+    memory?:            boolean;
+    enabled?:           boolean;
+    visible?:           boolean;
+    updates?:           number;
+    actionToCallUI?:    string;
+    guiVisible?:        boolean;
+    backgroundOpacity?: number;
 };
 
 const updateMatrixWorldTemp = Object3D.prototype.updateMatrixWorld;
@@ -138,7 +139,7 @@ export class ThreePerf {
         this.deepAnalyze = props.deepAnalyze ?? false;
         this.threeRenderer = props.renderer;
 
-        this.ui = new ThreePerfUI({ perf: this, domElement: props.domElement });
+        this.ui = new ThreePerfUI({ perf: this, domElement: props.domElement, backgroundOpacity: props.backgroundOpacity });
 
         this._visible = props.visible ?? true;
         this._enabled = props.enabled ?? true;
@@ -147,8 +148,8 @@ export class ThreePerf {
         this.anchorY = props.anchorY ?? 'top';
         this.showGraph = props.showGraph ?? true;
         this.memory = props.memory ?? true;
-        this.actionToCallUI = props.actionToCallUI ?? 'devmode';
-        this.guiVisible = props.guiVisible ?? true;
+        this.actionToCallUI = props.actionToCallUI ?? '';
+        this.guiVisible = props.guiVisible ?? false;
 
         window.addEventListener( 'keypress', this.keypressHandler );
 
@@ -291,6 +292,7 @@ export class ThreePerf {
         perfFolder.addInput( this, 'enabled', { label: 'Enabled' } );
         perfFolder.addInput( this, 'anchorX', { label: 'xAnchor', options: { left: 'left', right: 'right' } });
         perfFolder.addInput( this, 'anchorY', { label: 'yAnchor', options: { top: 'top', bottom: 'bottom' } });
+        perfFolder.addInput( this, 'backgroundOpacity', { label: 'Background opacity', min: 0, max: 1, step: 0.1 } );
         perfFolder.addInput( this, 'memory', { label: 'Memory' } );
         perfFolder.addInput( this, 'showGraph', { label: 'Charts' } );
         perfFolder.addInput( this, 'scale', { label: 'Scale', min: 0.1, max: 2, step: 0.1 } );
@@ -327,6 +329,8 @@ export class ThreePerf {
     //
 
     private keypressHandler = ( event: KeyboardEvent ) : void => {
+
+        if ( ! this.actionToCallUI ) return;
 
         this._keypressed += event.key;
         const keys = this._keypressed.split('');
@@ -519,6 +523,18 @@ export class ThreePerf {
     set updates ( value: number ) {
 
         this.perfEngine.logsPerSecond = value;
+
+    };
+
+    get backgroundOpacity () {
+
+        return this.ui._backgroundOpacity;
+
+    };
+
+    set backgroundOpacity ( value: number ) {
+
+        this.ui.setBackgroundOpacity( value );
 
     };
 
