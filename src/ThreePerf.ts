@@ -21,7 +21,6 @@ interface IThreePerfProps {
     memory?:            boolean;
     enabled?:           boolean;
     visible?:           boolean;
-    updates?:           number;
     actionToCallUI?:    string;
     guiVisible?:        boolean;
     backgroundOpacity?: number;
@@ -150,6 +149,7 @@ export class ThreePerf {
         this.memory = props.memory ?? true;
         this.actionToCallUI = props.actionToCallUI ?? '';
         this.guiVisible = props.guiVisible ?? false;
+        this.gui.element.parentElement!.style.width = '300px';
 
         window.addEventListener( 'keypress', this.keypressHandler );
 
@@ -296,7 +296,7 @@ export class ThreePerf {
         perfFolder.addInput( this, 'memory', { label: 'Memory' } );
         perfFolder.addInput( this, 'showGraph', { label: 'Charts' } );
         perfFolder.addInput( this, 'scale', { label: 'Scale', min: 0.1, max: 2, step: 0.1 } );
-        perfFolder.addInput( this, 'updates', { label: 'Updates', min: 1, max: 60, step: 1 } );
+        perfFolder.addInput( this, 'logsPerSecond', { label: 'LogsPerSecond', min: 1, max: 60, step: 1 } );
 
         //
 
@@ -514,13 +514,13 @@ export class ThreePerf {
 
     };
 
-    get updates () {
+    get logsPerSecond () {
 
         return this.perfEngine.logsPerSecond;
 
     };
 
-    set updates ( value: number ) {
+    set logsPerSecond ( value: number ) {
 
         this.perfEngine.logsPerSecond = value;
 
