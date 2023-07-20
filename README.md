@@ -30,7 +30,6 @@ showGraph?: boolean // toggles cpu/gpu/fps graphs rendering
 memory?: boolean // toggles memory info visiblity [like geos / textures / shaders etc count]
 enabled?: boolean // toggles stats harvesting
 visible?: boolean // stats are harvested, but stats panel is hidden
-updates?: number //
 actionToCallUI?: string // by default is disabled [''], but if set and type this text in the tab window three-perf dev gui will be shown
 guiVisible?: boolean, // default three-perf dev gui visiblity [falde by default]
 backgroundOpacity?: number // stats block background opacity level [0.7 by default]
