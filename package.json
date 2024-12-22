@@ -42,11 +42,11 @@
     "url": "https://github.com/TheoTheDev/three-perf/issues"
   },
   "dependencies": {
-    "troika-three-text": "^0.47.2",
+    "troika-three-text": "^0.52.0",
     "tweakpane": "^3.1.10"
   },
   "devDependencies": {
-    "@types/three": "^0.152.1",
+    "@types/three": "^0.170.0",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",
@@ -54,6 +54,6 @@
     "vite": "^4.3.9"
   },
   "peerDependencies": {
-    "three": ">=0.151"
+    "three": ">=0.170"
   }
 }
