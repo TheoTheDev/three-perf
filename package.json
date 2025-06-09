@@ -1,6 +1,6 @@
 {
   "name": "three-perf",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Easily monitor your vanilla ThreeJS app performances.",
   "keywords": [
     "three",
@@ -32,7 +32,7 @@
     "url": "git+https://github.com/TheoTheDev/three-perf.git"
   },
   "homepage": "https://github.com/TheoTheDev/three-perf",
-  "author": "Bohdan Horpynchuk (https://github.com/TheoTheDev)",
+  "author": "TheoTheDev (https://github.com/TheoTheDev)",
   "license": "MIT",
   "files": [
     "dist/*",
